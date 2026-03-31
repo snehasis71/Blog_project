@@ -1,0 +1,90 @@
+<html>
+<head>
+    <title>{{ post.title }}</title>
+    <style>
+       body { 
+            font-family: Arial, sans-serif; 
+            background: #f4f4f4; 
+            margin: 0;
+            align-items: center;      /* vertical center */
+            justify-content: center;  /* horizontal center */
+            height: 100vh;            /* full screen height */
+        }
+        .post-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            max-width: 800px; 
+            margin: 20px auto; 
+        }
+        .post-comment { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            max-width: 800px; 
+             margin: 20px auto; 
+        }
+        h1 { 
+            text-align: center; 
+        }
+        p { 
+            font-size: 16px; 
+            line-height: 1.5; 
+        }
+        .meta { 
+            color: #555; 
+            font-size: 14px; 
+            margin-bottom: 20px; 
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+
+        }
+
+       textarea {
+           /* height: 200px;*/
+            resize: none; 
+        }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <h1>{{ post.title }}</h1>
+        <div class="meta">
+            By <b>{{ post.author.username }}</b> | 
+            Created: {{ post.created_at|date:"M d, Y H:i" }} | 
+            Updated: {{ post.updated_at|date:"M d, Y H:i" }}
+        </div>
+        <p>{{ post.content|linebreaksbr }}</p><br><br>
+
+        <a href="{% url 'home' %}">← Back to all posts</a>
+    </div>
+    <div class="post-comment">
+        <h3>Add Comment</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <textarea name="content" placeholder="Write a comment..." required></textarea>
+            <br>
+            <button type="submit">Post Comment</button>
+        </form>
+
+        <h3>Comments</h3>
+        {% for comment in comments %}
+            <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px;">
+                <strong>{{ comment.user.username }}</strong>
+                <p>{{ comment.content }}</p>
+                <small>{{ comment.created_at }}</small>
+            </div>
+        {% empty %}
+            <p>No comments yet.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

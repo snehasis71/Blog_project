@@ -1,0 +1,110 @@
+
+<html>
+<head>
+
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* vertically center */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+
+        }
+
+       textarea {
+           /* height: 200px;*/
+            resize: none; 
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #07b624;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #125404;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 12px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        /* 🔥 Hover effect */
+        .back-btn:hover {
+            background: #0056b3;
+        }
+    
+        .create-container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 700px;
+        } 
+
+    </style>
+    
+    </head>
+
+    <body>
+    <div class = "create-container">
+
+        <h1 style="text-align:center;">Create Post</h1>
+        <form method="POST" style="display:inline;">
+            {% csrf_token %}
+            <b><label>{{form.title.label_tag}}</label></b>
+            {{ form.title}}  <br><br>
+            <b><label>{{form.content.label_tag}}</label></b>
+            {{ form.content}}  <br>
+            <small id="charCount">2000 charecters remaning</small><br><br>    
+            <button type="submit">Save</button>
+        </form>
+        
+        <a href="{% url 'home' %}" class="back-btn" >Back</a>
+        
+    </div>
+</body>
+<script>
+        const contentBox = document.getElementById('id_content');  // Django automatically sets id as 'id_fieldname'
+        const charCount = document.getElementById('charCount');
+        const maxChars = 2000;
+
+        contentBox.setAttribute('maxlength', maxChars);  // Ensure HTML limit
+
+        contentBox.addEventListener('input', function() {
+            const remaining = maxChars - contentBox.value.length;
+            charCount.textContent = remaining + " characters remaining";
+        })
+</script>
+</html>

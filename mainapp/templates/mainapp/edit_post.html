@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Blog Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* vertically center */
+        }
+
+     
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #07b624;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #125404;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 12px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        /* 🔥 Hover effect */
+        .back-btn:hover {
+            background: #0056b3;
+        }
+    
+        .edit-container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 700px;
+        } 
+
+    </style>
+</head>
+
+<body>
+
+<div class="edit-container" style="max-width:700px; margin:auto; font-family:Arial;">
+<h1 style="text-align:center; margin-top:30px">Edit Blog Post</h1>
+
+<form method ="POST">
+    {% csrf_token %}
+    
+
+    <b>Title</b>
+    <input type="text" name="title" id = "title" value="{{ post.title }}"><br><br>
+
+   <b>Details</b>
+    <textarea name="content" id=""content">{{ post.content }}</textarea><br><br>
+
+    <a href="{% url 'home' %}" class="back-btn">Back</a>
+
+    <button type = "submit">Update</button>
+    
+    
+</form>
+</div>
+
+</body>
+
+</html>
