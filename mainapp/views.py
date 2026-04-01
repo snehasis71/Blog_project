@@ -28,12 +28,21 @@ def paginate_queryset (request, queryset, per_page=5):
     page_obj = paginator.get_page (page_number)
     return page_obj
 
+def highlight(text, query):
+    #Highlight all occurancs of query text
+    if not query:
+        return text
+    # convert to string in case a User or something else is passed
+    text = str(text)
+    pattern = re.compile (re.escape(query), re.IGNORECASE)
+    return mark_safe(pattern.sub(r'<mark\g<0></mark>', text))
+
 @login_required(login_url='login')
 def home(request):
     #Seacrh facilities
     query = request.GET.get ('q','').strip()
 
-    #show all posts latest on first
+    #get all posts latest on first
     posts = Post.objects.all().order_by('-updated_at')
 
     #filter if only search quesry exists
@@ -45,50 +54,45 @@ def home(request):
         ).order_by('-updated_at')
     
     page_obj = paginate_queryset (request, posts, per_page=5)
+    
+    #build highlight posts list
     posts_to_render = [] # initializing at the top  
-    #highlight search matches
     for post in page_obj:
+        # highlight only strings, not User objects
         if query:
             title = mark_safe(re.sub(
-                        f"({re.escape(query)})", 
-                        r"<mark>\1</mark>", 
-                        post.title or "", 
-                        flags=re.IGNORECASE)
-                    )
+                f"({re.escape(query)})",
+                r"<mark>\1</mark>",
+                post.title or "",
+                flags=re.IGNORECASE
+            ))
             content = mark_safe(re.sub(
-                        f"({re.escape(query)})", 
-                        r"<mark>\1</mark>", 
-                        post.content or "", 
-                        flags=re.IGNORECASE)
-                    )
+                f"({re.escape(query)})",
+                r"<mark>\1</mark>",
+                post.content or "",
+                flags=re.IGNORECASE
+            ))
             author = mark_safe(re.sub(
-                    f"({re.escape(query)})", 
-                    r"<mark>\1</mark>", 
-                    post.author.username or "", 
-                    flags=re.IGNORECASE)
-                )
-       
-        else: 
+                f"({re.escape(query)})",
+                r"<mark>\1</mark>",
+                post.author.username or "",
+                flags=re.IGNORECASE
+            ))
+        else:
             title = post.title
             content = post.content
             author = post.author.username
-            
+
         posts_to_render.append({
             'post_obj': post,
             'title': title,
-            'content':content,
+            'content': content,
             'author': author,
-            'created_at' : post.created_at,
-            'updated_at' : post.updated_at,
-            'id' : post.id,
-            'author_obj':post.author,
         })
-    
     return render(request, 'mainapp/home.html', {
         'posts': posts_to_render,
         'query' :query,
-        'page_obj':page_obj,
-        'user' :request.user,
+        'page_obj': page_obj
     })
 
 @login_required(login_url='login')
@@ -144,7 +148,15 @@ def signup (request):
     if request.method == "POST":
         username = request.POST.get ('username')
         password = request.POST.get ('password')
+        confirm_password = request.POST.get('confirm_password')
 
+        #Check for password and confirm password
+        if password != confirm_password:
+            return render (request, 'mainapp/signup.html', {
+                           'error': 'Passwords do not match'
+        })
+         
+        
         #Check if username already exists
         if User.objects.filter (username=username).exists():
             return render (request, 'mainapp/signup.html', {
@@ -180,15 +192,6 @@ def login_view (request):
 def logout_view(request):
     logout(request) #This will end user session
     return redirect ('login') #Redirect to login page
-
-#details of indiviaul blog
-@login_required(login_url='login')
-def post_details (request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    return render (request, 'mainapp/post_details.html',{
-        'post': post,
-        'user' : request.user,
-    })
 
 #like post
 @login_required

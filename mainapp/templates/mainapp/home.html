@@ -133,6 +133,25 @@
         .like-btn:hover, .dislike-btn:hover {
             background-color: #f4e11b;
         }
+        .post-row {
+            display: flex;
+            align-items: center;        /* vertical center */
+            justify-content: space-between; /* text left, buttons right */
+            gap: 15px;
+        }
+
+        .post-text {
+            flex: 1;   /* take remaining space */
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .actions form {
+            margin: 0;   /* remove default form spacing */
+        }
         
     </style>
     </head>
@@ -173,30 +192,37 @@
                 {% for post in posts %}
                  <tr>                                
                     <td> 
-                        <a href = "{% url 'post_details' post.id %}">
+                        <a href = "{% url 'post_details' post.post_obj.id %}">
                             {{ post.title | safe }}
                         </a>
                     </td>
-                    <td>{{ post.content | truncatechars:150 | safe}}
-                        <form action="{% url 'like_post' post.id %}" method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="like-btn">
-                                👍 {{ post.post_obj.total_likes }}
-                            </button>
-                        </form>
-
-                        <form action="{% url 'dislike_post' post.id %}" method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="dislike-btn">
-                                👎 {{ post.post_obj.total_dislikes }}
-                            </button>
+                    <td>
+                         <div class="post-row">
+                            <span class="post-text">
+                                {{ post.content|truncatechars:150 }}
+                            </span>
+                            <div class="actions">
+                                <form action="{% url 'like_post' post.post_obj.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="like-btn">
+                                        👍 {{ post.post_obj.likes.count }}
+                                    </button>
+                                </form>
+                                <form action="{% url 'dislike_post' post.post_obj.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dislike-btn">
+                                        👎 {{ post.post_obj.dislikes.count }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </td>
                     <td><b>{{post.author| safe}} :</b> on 
-                        {{post.created_at|date:"M d, Y H:i"}}</td>
-                    <td>{{post.updated_at|date:"M d, Y H:i"}}</td>
+                        {{post.post_obj.created_at|date:"M d, Y H:i"}}</td>
+                    <td>{{post.post_obj.updated_at|date:"M d, Y H:i"}}</td>
                     {% if request.user.is_superuser %}
-                        <td style="white-space: nowrap;"><a href="{% url 'edit_post' post.id %}" class = "edit-btn">Edit</a>
-                            <form method="POST" action="{% url 'delete_post' post.id %}" style="display:inline;">
+                        <td style="white-space: nowrap;"><a href="{% url 'edit_post' post.post_obj.id %}" class = "edit-btn">Edit</a>
+                            <form method="POST" action="{% url 'delete_post' post.post_obj.id %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit">Delete</button>
                             </form>
